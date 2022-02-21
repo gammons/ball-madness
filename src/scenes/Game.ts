@@ -16,6 +16,12 @@ export default class Demo extends Phaser.Scene {
   detectorLoaded: boolean
   photo: any
   canvas: any
+  l1: Phaser.Geom.Line
+  l2: Phaser.Geom.Line
+  l1Physics: any
+  l2Physics: any
+  l1LastX: number
+  l1LastY: number
 
   constructor() {
     super({
@@ -47,6 +53,9 @@ export default class Demo extends Phaser.Scene {
 
     this.videoLoaded = false
     this.detectorLoaded = false
+
+    this.l1LastX = -1
+    this.l1LastY = -1
   }
 
   async preload() {
@@ -96,7 +105,7 @@ export default class Demo extends Phaser.Scene {
 
   create() {
     this.graphics = this.add.graphics()
-    this.matter.world.setBounds(0, 0, 800, 600, 32, true, true, false, true)
+    this.matter.world.setBounds(0, 0, 640, 480, 32, true, true, false, true)
 
     for (var i = 0; i < 50; i++) {
       const ball = this.matter.add.image(Phaser.Math.Between(100, 700), Phaser.Math.Between(-600, 0), 'ball');
@@ -106,12 +115,21 @@ export default class Demo extends Phaser.Scene {
     }
 
     this.leftHand = this.add.rectangle(200, 30, 100, 20, 0xffffff);
-    this.matter.add.gameObject(this.leftHand)
+    this.leftHandPhysics = this.matter.add.gameObject(this.leftHand)
+    this.leftHandPhysics.setIgnoreGravity(true)
 
     this.rightHand = this.add.rectangle(400, 30, 100, 20, 0xffffff);
-    this.matter.add.gameObject(this.rightHand)
+    //this.matter.add.gameObject(this.rightHand)
 
     this.matter.add.mouseSpring();
+
+    this.l1 = this.add.line(0, 0, 0, 0, 0, 0, 0xff0000)
+    //this.l1Physics = this.matter.add.gameObject(this.l1)
+    //this.l1Physics.setIgnoreGravity(true)
+
+    this.l2 = this.add.line(300, 400, 0, 0, 140, 0, 0x9933ff)
+    //this.l2Physics = this.matter.add.gameObject(this.l2)
+    //this.l2Physics.setIgnoreGravity(true)
 
     // tweens do not mess with physics.
     //var timeline = this.tweens.add(
@@ -142,9 +160,26 @@ export default class Demo extends Phaser.Scene {
       //var data = this.canvas.toDataURL('image/png');
       const hands = await this.detector.estimateHands(this.video);
       if (hands.length > 0) {
-        console.log(hands)
-      }
+        const x1 = 640 - hands[0].keypoints[0].x
+        const y1 = hands[0].keypoints[0].y
+        const x2 = 640 - hands[0].keypoints[12].x
+        const y2 = hands[0].keypoints[12].y
 
+        this.l1.setTo(x1, y1, x2, y2)
+        //this.l1Physics.setTo(x1, y1, x2, y2)
+
+        const velocityX = Math.abs(x2 - this.l1LastX)
+        const velocityY = Math.abs(y2 - this.l1LastY)
+
+        if (this.l1LastX > -1) {
+          //this.l1Physics.setVelocityX(velocityX)
+        }
+        this.l1LastX = x2
+        if (this.l1LastY > -1) {
+          //this.l1Physics.setVelocityY(velocityY)
+        }
+        this.l1LastY = y2
+      }
     }
     //console.log(this.leftHand.body.position)
     //if (this.leftHand.y > 550 && this.leftHand.x < 600) {
