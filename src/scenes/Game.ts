@@ -1,12 +1,13 @@
 // see below as a reference:
 // https://docs.idew.org/video-game/project-references/phaser-coding/physics-and-collisions
-import Phaser from 'phaser';
+import Phaser from 'phaser'
 
 export default class Demo extends Phaser.Scene {
   balls: any[]
   graphics: any
   leftHand: any
   rightHand: any
+  ctx: any
 
   constructor() {
     super({
@@ -27,9 +28,37 @@ export default class Demo extends Phaser.Scene {
     });
   }
 
-  preload() {
+  async preload() {
     this.load.image('ball', 'assets/aqua_ball.png')
     this.load.image('hand', 'assets/platform.png')
+
+    const videoConfig = {
+      audio: false,
+      video: {
+        facingMode: 'user',
+        width: {
+          ideal: 640
+        },
+        height: {
+          ideal: 480
+        },
+        frameRate: {
+          ideal: 60
+        }
+      },
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia(videoConfig);
+    //const canvas = document.getElementById('output')
+    //this.ctx = canvas.getContext('2d')
+
+    this.video = document.querySelector('video')
+    this.video.srcObject = stream
+
+    //canvas.width = 800
+    //canvas.height = 600
+    //this.ctx.translate(800, 0)
+    //this.ctx.scale(-1, 1)
   }
 
   create() {
@@ -75,6 +104,7 @@ export default class Demo extends Phaser.Scene {
   }
 
   update() {
+    //this.ctx.drawImage(this.video, 0, 0, 800, 600)
     //console.log(this.leftHand.body.position)
     //if (this.leftHand.y > 550 && this.leftHand.x < 600) {
     //  this.leftHand.setPosition(this.leftHand.x + 1, this.leftHand.y)

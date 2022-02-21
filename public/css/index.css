@@ -1,0 +1,18 @@
+body {
+  background-color: black;
+}
+div#game {
+  z-index: 1;
+}
+
+div#game > canvas {
+}
+
+video {
+  width: 1500px;
+  position: absolute;
+  left: 150px;
+  top: 10px;
+  z-index: 10000;
+  opacity: 0.5;
+}
