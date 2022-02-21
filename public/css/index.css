@@ -15,4 +15,12 @@ video {
   top: 10px;
   z-index: 10000;
   opacity: 0.5;
+  transform: scaleX(-1);
+}
+
+canvas#webcam-image {
+  display: none;
+  opacity: 0;
+  width: 640px;
+  height: 480px;
 }

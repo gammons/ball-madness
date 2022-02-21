@@ -2,12 +2,20 @@
 // https://docs.idew.org/video-game/project-references/phaser-coding/physics-and-collisions
 import Phaser from 'phaser'
 
+import * as handPoseDetection from '@tensorflow-models/hand-pose-detection'
+import * as mpHands from '@mediapipe/hands'
+
 export default class Demo extends Phaser.Scene {
   balls: any[]
   graphics: any
   leftHand: any
   rightHand: any
   ctx: any
+  detector: any
+  videoLoaded: boolean
+  detectorLoaded: boolean
+  photo: any
+  canvas: any
 
   constructor() {
     super({
@@ -26,6 +34,19 @@ export default class Demo extends Phaser.Scene {
         }
       }
     });
+
+    this.canvas = document.querySelector("canvas#webcam-image")
+    this.canvas.width = 640
+    this.canvas.height = 480
+
+    this.ctx = this.canvas.getContext('2d')
+    this.ctx.translate(640, 0)
+    this.ctx.scale(-1, 1)
+
+    this.photo = document.querySelector("#photo")
+
+    this.videoLoaded = false
+    this.detectorLoaded = false
   }
 
   async preload() {
@@ -54,6 +75,18 @@ export default class Demo extends Phaser.Scene {
 
     this.video = document.querySelector('video')
     this.video.srcObject = stream
+    this.video.play()
+    this.videoLoaded = true
+
+    const model = handPoseDetection.SupportedModels.MediaPipeHands;
+    const detectorConfig = {
+      runtime: 'mediapipe',
+      modelType: 'full',
+      solutionPath: `https://cdn.jsdelivr.net/npm/@mediapipe/hands@${mpHands.VERSION}`
+    }
+    this.detector = await handPoseDetection.createDetector(model, detectorConfig);
+    this.detectorLoaded = true
+
 
     //canvas.width = 800
     //canvas.height = 600
@@ -103,8 +136,16 @@ export default class Demo extends Phaser.Scene {
     //timeline.play()
   }
 
-  update() {
-    //this.ctx.drawImage(this.video, 0, 0, 800, 600)
+  async update() {
+    if (this.videoLoaded && this.detectorLoaded) {
+      //this.ctx.drawImage(this.video, 0, 0, 640, 480)
+      //var data = this.canvas.toDataURL('image/png');
+      const hands = await this.detector.estimateHands(this.video);
+      if (hands.length > 0) {
+        console.log(hands)
+      }
+
+    }
     //console.log(this.leftHand.body.position)
     //if (this.leftHand.y > 550 && this.leftHand.x < 600) {
     //  this.leftHand.setPosition(this.leftHand.x + 1, this.leftHand.y)

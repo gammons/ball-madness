@@ -28,6 +28,9 @@
     "vite": "^2.0.0-beta.65"
   },
   "dependencies": {
-    "@tensorflow-models/hand-pose-detection": "^0.0.1"
+    "@mediapipe/hands": "^0.4.1635986972",
+    "@tensorflow-models/hand-pose-detection": "^0.0.1",
+    "@tensorflow/tfjs-converter": "^3.13.0",
+    "@tensorflow/tfjs-core": "^3.13.0"
   }
 }
