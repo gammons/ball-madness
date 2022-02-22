@@ -22,6 +22,8 @@ export default class Demo extends Phaser.Scene {
   l2Physics: any
   l1LastX: number
   l1LastY: number
+  text: any
+  lastTime: number
 
   constructor() {
     super({
@@ -34,8 +36,8 @@ export default class Demo extends Phaser.Scene {
             y: 0.2,
           },
           debug: {
-            showBody: true,
-            showStaticBody: true
+            showBody: false,
+            showStaticBody: false
           }
         }
       }
@@ -49,6 +51,7 @@ export default class Demo extends Phaser.Scene {
 
     this.l1LastX = -1
     this.l1LastY = -1
+    this.lastTime = 0
   }
 
   async preload() {
@@ -103,9 +106,14 @@ export default class Demo extends Phaser.Scene {
     window.leftHand = this.leftHand
     this.leftHandPhysics = this.matter.add.gameObject(this.leftHand)
     this.leftHandPhysics.setIgnoreGravity(true)
+    this.leftHandPhysics.setFriction(0)
+    this.leftHandPhysics.setFrictionAir(0)
+
 
     //this.rightHand = this.add.rectangle(400, 30, 100, 20, 0xffffff);
     //this.matter.add.gameObject(this.rightHand)
+    //
+    this.text = this.add.text(0, 0, '', { font: '16px Courier', fill: '#00ff00' });
 
     this.matter.add.mouseSpring();
 
@@ -124,12 +132,22 @@ export default class Demo extends Phaser.Scene {
         this.l1.setTo(x1, y1, x2, y2)
 
         this.leftHand.setPosition(x1, y1)
-        this.leftHand.setSize(Math.abs(x1 - x2), Math.abs(y1 - y2))
+        this.leftHand.setAngularVelocity(0)
+        //this.leftHand.setSize(Math.abs(x1 - x2), Math.abs(y1 - y2))
         this.leftHandPhysics.setPosition(x1, y1)
+        this.leftHandPhysics.setAngularVelocity(0)
         this.leftHandPhysics.setBody(Math.abs(x1 - x2), Math.abs(y1 - y2))
 
         const velocityX = Math.abs(x2 - this.l1LastX)
         const velocityY = Math.abs(y2 - this.l1LastY)
+        //this.text.setText(`Velocity: (${Math.round(velocityX)}, ${Math.round(velocityY)})`)
+        //
+        this.text.setText([
+          `FPS: ${Math.round(1000 / (Date.now() - this.lastTime))}`,
+          `Pos: (${Math.round(x1)}, ${Math.round(y1)})`,
+          `Vel: (${Math.round(velocityX)}, ${Math.round(velocityY)})`
+        ])
+        this.lastTime = Date.now()
 
         if (this.l1LastX > -1) {
           this.leftHandPhysics.setVelocityX(velocityX)
