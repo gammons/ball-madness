@@ -24,12 +24,14 @@ export default class Demo extends Phaser.Scene {
   l1LastY: number
   text: any
   lastTime: number
+  velocityX: number
+  velocityY: number
 
   constructor() {
     super({
       key: "balls",
       physics: {
-        default: 'matter',
+        default: 'arcade',
         matter: {
           enableSleeping: true,
           gravity: {
@@ -43,15 +45,15 @@ export default class Demo extends Phaser.Scene {
       }
     });
 
-
-    this.photo = document.querySelector("#photo")
-
     this.videoLoaded = false
     this.detectorLoaded = false
 
     this.l1LastX = -1
     this.l1LastY = -1
     this.lastTime = 0
+
+    this.velocityX = 5
+    this.velocityY = 5
   }
 
   async preload() {
@@ -103,11 +105,12 @@ export default class Demo extends Phaser.Scene {
     }
 
     this.leftHand = this.add.rectangle(200, 30, 100, 20, 0x00ff00);
-    window.leftHand = this.leftHand
     this.leftHandPhysics = this.matter.add.gameObject(this.leftHand)
     this.leftHandPhysics.setIgnoreGravity(true)
     this.leftHandPhysics.setFriction(0)
     this.leftHandPhysics.setFrictionAir(0)
+    this.leftHandPhysics.setVelocity(10, 10)
+    this.leftHandPhysics.setAngularVelocity(0)
 
 
     //this.rightHand = this.add.rectangle(400, 30, 100, 20, 0xffffff);
@@ -136,28 +139,29 @@ export default class Demo extends Phaser.Scene {
         //this.leftHand.setSize(Math.abs(x1 - x2), Math.abs(y1 - y2))
         this.leftHandPhysics.setPosition(x1, y1)
         this.leftHandPhysics.setAngularVelocity(0)
-        this.leftHandPhysics.setBody(Math.abs(x1 - x2), Math.abs(y1 - y2))
+        //this.leftHandPhysics.setBody(Math.abs(x1 - x2), Math.abs(y1 - y2))
 
-        const velocityX = Math.abs(x2 - this.l1LastX)
-        const velocityY = Math.abs(y2 - this.l1LastY)
+        const diffX = Math.abs(x2 - this.l1LastX)
+        const diffY = Math.abs(y2 - this.l1LastY)
         //this.text.setText(`Velocity: (${Math.round(velocityX)}, ${Math.round(velocityY)})`)
         //
+
+        //this.velocityX = diffX > this.velocityX ? this.velocityX + 1 : this.velocityX - 1
+        //this.velocityY = diffX > this.velocityY ? this.velocityY + 1 : this.velocityY - 1
+
+        //this.leftHandPhysics.setVelocityX(this.velocityX)
+        //this.leftHandPhysics.setVelocityY(this.velocityY)
+
+        // not sure if I need this any more
+        this.l1LastX = x2
+        this.l1LastY = y2
+
         this.text.setText([
           `FPS: ${Math.round(1000 / (Date.now() - this.lastTime))}`,
           `Pos: (${Math.round(x1)}, ${Math.round(y1)})`,
-          `Vel: (${Math.round(velocityX)}, ${Math.round(velocityY)})`
+          `Vel: (${Math.round(this.velocityX)}, ${Math.round(this.velocityY)})`
         ])
         this.lastTime = Date.now()
-
-        if (this.l1LastX > -1) {
-          this.leftHandPhysics.setVelocityX(velocityX)
-        }
-        this.l1LastX = x2
-        if (this.l1LastY > -1) {
-          this.leftHandPhysics.setVelocityY(velocityY)
-          //this.l1Physics.setVelocityY(velocityY)
-        }
-        this.l1LastY = y2
       }
     }
   }
